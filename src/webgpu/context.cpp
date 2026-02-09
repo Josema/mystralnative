@@ -306,11 +306,11 @@ bool Context::initializeHeadless() {
 
 #if defined(MYSTRAL_WEBGPU_WGPU)
     while (!adapterData.completed) {
-        wgpuInstanceProcessEvents(instance_);
+        wgpuInstanceProcessEvents_Compat(instance_);
     }
 #elif defined(MYSTRAL_WEBGPU_DAWN)
     while (!adapterData.completed) {
-        wgpuInstanceProcessEvents(instance_);
+        wgpuInstanceProcessEvents_Compat(instance_);
     }
 #endif
 
@@ -395,11 +395,11 @@ bool Context::initializeHeadless() {
 
 #if defined(MYSTRAL_WEBGPU_WGPU)
     while (!deviceData.completed) {
-        wgpuInstanceProcessEvents(instance_);
+        wgpuInstanceProcessEvents_Compat(instance_);
     }
 #elif defined(MYSTRAL_WEBGPU_DAWN)
     while (!deviceData.completed) {
-        wgpuInstanceProcessEvents(instance_);
+        wgpuInstanceProcessEvents_Compat(instance_);
     }
 #endif
 
@@ -564,12 +564,12 @@ bool Context::createSurface(void* nativeHandle, int platformType) {
     // wgpu-native is synchronous for requestAdapter, but we should poll just in case
 #if defined(MYSTRAL_WEBGPU_WGPU)
     while (!adapterData.completed) {
-        wgpuInstanceProcessEvents(instance_);
+        wgpuInstanceProcessEvents_Compat(instance_);
     }
 #elif defined(MYSTRAL_WEBGPU_DAWN)
     // Dawn also needs event processing
     while (!adapterData.completed) {
-        wgpuInstanceProcessEvents(instance_);
+        wgpuInstanceProcessEvents_Compat(instance_);
     }
 #endif
 
@@ -694,11 +694,11 @@ bool Context::createSurface(void* nativeHandle, int platformType) {
 
 #if defined(MYSTRAL_WEBGPU_WGPU)
     while (!deviceData.completed) {
-        wgpuInstanceProcessEvents(instance_);
+        wgpuInstanceProcessEvents_Compat(instance_);
     }
 #elif defined(MYSTRAL_WEBGPU_DAWN)
     while (!deviceData.completed) {
-        wgpuInstanceProcessEvents(instance_);
+        wgpuInstanceProcessEvents_Compat(instance_);
     }
 #endif
 
@@ -777,7 +777,7 @@ bool Context::createSurfaceWithDisplay(void* display, void* window, int platform
 
 #if defined(MYSTRAL_WEBGPU_WGPU) || defined(MYSTRAL_WEBGPU_DAWN)
     while (!adapterData.completed) {
-        wgpuInstanceProcessEvents(instance_);
+        wgpuInstanceProcessEvents_Compat(instance_);
     }
 #endif
 
@@ -871,7 +871,7 @@ bool Context::createSurfaceWithDisplay(void* display, void* window, int platform
 
 #if defined(MYSTRAL_WEBGPU_WGPU) || defined(MYSTRAL_WEBGPU_DAWN)
     while (!deviceData.completed) {
-        wgpuInstanceProcessEvents(instance_);
+        wgpuInstanceProcessEvents_Compat(instance_);
     }
 #endif
 
@@ -1076,7 +1076,7 @@ bool Context::saveScreenshot(const char* filename) {
     int maxIterations = 5000;
     while (!mapData.completed && maxIterations-- > 0) {
         wgpuDeviceTick(device_);
-        wgpuInstanceProcessEvents(instance_);
+        wgpuInstanceProcessEvents_Compat(instance_);
         if (!mapData.completed && maxIterations % 100 == 0) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
@@ -1191,7 +1191,7 @@ bool Context::captureFrame(std::vector<uint8_t>& outData, uint32_t& outWidth, ui
     int maxIterations = 5000;
     while (!mapData.completed && maxIterations-- > 0) {
         wgpuDeviceTick(device_);
-        wgpuInstanceProcessEvents(instance_);
+        wgpuInstanceProcessEvents_Compat(instance_);
         if (!mapData.completed && maxIterations % 100 == 0) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }

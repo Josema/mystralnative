@@ -42,6 +42,19 @@ typedef WGPUSurfaceDescriptorFromAndroidNativeWindow WGPUSurfaceDescriptorFromAn
 // Dawn proc initialization - not needed for wgpu-native
 #define WGPU_NEEDS_PROC_INIT 0
 
+// wgpuInstanceProcessEvents - not implemented on iOS wgpu-native
+// Check for iOS: TARGET_OS_IPHONE is defined in TargetConditionals.h
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#if TARGET_OS_IPHONE
+#define wgpuInstanceProcessEvents_Compat(instance) ((void)0)
+#else
+#define wgpuInstanceProcessEvents_Compat(instance) wgpuInstanceProcessEvents(instance)
+#endif
+#else
+#define wgpuInstanceProcessEvents_Compat(instance) wgpuInstanceProcessEvents(instance)
+#endif
+
 // Texture copy types
 typedef WGPUImageCopyTexture WGPUImageCopyTexture_Compat;
 typedef WGPUImageCopyBuffer WGPUImageCopyBuffer_Compat;
@@ -125,6 +138,9 @@ typedef WGPUSurfaceSourceAndroidNativeWindow WGPUSurfaceDescriptorFromAndroidNat
 
 // Dawn proc initialization - Dawn requires setting up procs before use
 #define WGPU_NEEDS_PROC_INIT 1
+
+// wgpuInstanceProcessEvents - Dawn implements this, so always call it
+#define wgpuInstanceProcessEvents_Compat(instance) wgpuInstanceProcessEvents(instance)
 
 // Texture copy types (Dawn renamed Image* to Texel*)
 typedef WGPUTexelCopyTextureInfo WGPUImageCopyTexture_Compat;

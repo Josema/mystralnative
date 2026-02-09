@@ -47,10 +47,10 @@ set(APP_RESOURCES
 )
 
 # Asset files (need to be copied)
-set(ASSET_DIR "${MYSTRAL_ROOT}/../../apps/mystral/static/assets")
+set(ASSET_DIR "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 set(ASSET_FILES
-    "${ASSET_DIR}/DamagedHelmet/glTF-Binary/DamagedHelmet.glb"
-    "${ASSET_DIR}/Skyboxes/sunny_rose_garden_2k.hdr"
+    "${ASSET_DIR}/DamagedHelmet.glb"
+    "${ASSET_DIR}/sunny_rose_garden_2k.hdr"
 )
 
 # Create the iOS app bundle
@@ -101,26 +101,14 @@ message(STATUS "mystral-runtime: ${MYSTRAL_RUNTIME_LIB}")
 # Find dependencies in third_party directory
 set(DEPS_DIR "${MYSTRAL_ROOT}/third_party")
 
-# SDL3 - use xcframework (link as framework, not binary)
-if(CMAKE_OSX_SYSROOT MATCHES "iphoneos")
-    set(SDL3_FRAMEWORK_DIR "${DEPS_DIR}/sdl3/SDL3.xcframework/ios-arm64")
-else()
-    set(SDL3_FRAMEWORK_DIR "${DEPS_DIR}/sdl3/SDL3.xcframework/ios-arm64_x86_64-simulator")
-endif()
+# SDL3 - use source headers and built library from mystral build
+set(SDL3_INCLUDE_DIR "${DEPS_DIR}/sdl3/SDL3-3.2.8/include")
+set(SDL3_BUILD_INCLUDE_DIR "${MYSTRAL_BUILD_DIR}/sdl3-build/include-config-release")
 
-# Add SDL3 include directories (must be after SDL3_FRAMEWORK_DIR is defined)
-# SDL3 headers use <SDL3/...> includes, so we need to create a symlink structure
-# We create a local include/SDL3 symlink pointing to the framework Headers
-set(SDL3_INCLUDE_SETUP_DIR "${CMAKE_BINARY_DIR}/sdl3-include")
-file(MAKE_DIRECTORY "${SDL3_INCLUDE_SETUP_DIR}")
-# Create a symlink SDL3 -> actual Headers directory
-execute_process(
-    COMMAND ${CMAKE_COMMAND} -E create_symlink
-        "${SDL3_FRAMEWORK_DIR}/SDL3.framework/Headers"
-        "${SDL3_INCLUDE_SETUP_DIR}/SDL3"
-)
+# Add SDL3 include directories
 target_include_directories(MystralGLTFViewer PRIVATE
-    ${SDL3_INCLUDE_SETUP_DIR}
+    ${SDL3_INCLUDE_DIR}
+    ${SDL3_BUILD_INCLUDE_DIR}
 )
 
 # wgpu-native
@@ -139,25 +127,13 @@ else()
 endif()
 
 # Add framework search path for SDL3
-target_link_options(MystralGLTFViewer PRIVATE "-F${SDL3_FRAMEWORK_DIR}")
-
-# Embed SDL3 framework using Xcode's native embedding (handles signing automatically)
-set(SDL3_FRAMEWORK_PATH "${SDL3_FRAMEWORK_DIR}/SDL3.framework")
-set_target_properties(MystralGLTFViewer PROPERTIES
-    XCODE_EMBED_FRAMEWORKS "${SDL3_FRAMEWORK_PATH}"
-    XCODE_EMBED_FRAMEWORKS_CODE_SIGN_ON_COPY YES
-    XCODE_EMBED_FRAMEWORKS_REMOVE_HEADERS_ON_COPY YES
-)
-
-# Set rpath to find embedded frameworks
-set_target_properties(MystralGLTFViewer PROPERTIES
-    XCODE_ATTRIBUTE_LD_RUNPATH_SEARCH_PATHS "@executable_path/Frameworks"
-)
+# SDL3 static library from mystral build
+set(SDL3_LIB "${MYSTRAL_BUILD_DIR}/sdl3-build/Release-iphonesimulator/libSDL3.a")
 
 # Link libraries and frameworks
 target_link_libraries(MystralGLTFViewer PRIVATE
     ${MYSTRAL_RUNTIME_LIB}
-    "-framework SDL3"
+    ${SDL3_LIB}
     ${WGPU_LIB}
     ${SKIA_LIB}
 )
@@ -180,6 +156,13 @@ target_link_libraries(MystralGLTFViewer PRIVATE
     "-framework CoreHaptics"
     "-framework AVFAudio"
     "-framework AudioToolbox"
+    # Additional frameworks required by SDL3
+    "-framework AVFoundation"
+    "-framework CoreMedia"
+    "-framework CoreVideo"
+    "-framework CoreMotion"
+    "-framework CoreBluetooth"
+    "-framework OpenGLES"
 )
 
 # System libraries

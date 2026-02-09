@@ -45,3 +45,4 @@ output.json
 
 # Dependencies
 node_modules/
+third_party/

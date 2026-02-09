@@ -917,8 +917,6 @@ set(MYSTRAL_SOURCES
     src/canvas/canvas2d.cpp
     src/canvas/canvas2d_bindings.cpp
     src/input/input_shim.cpp
-    src/platform/window.cpp
-    src/platform/input.cpp
     src/utils/stb_impl.cpp
     src/utils/cgltf_impl.cpp
     src/http/http_client.cpp
@@ -930,11 +928,17 @@ set(MYSTRAL_SOURCES
     src/audio/audio_bindings.cpp
     src/vfs/embedded_bundle.cpp
     src/async/event_loop.cpp
-    src/debug/debug_server.cpp
     src/video/async_capture.cpp
     src/video/video_recorder.cpp
     src/video/gpu_readback_recorder.cpp
 )
+
+# Debug server requires libuv for WebSocket support
+if(TARGET libuv::libuv)
+    list(APPEND MYSTRAL_SOURCES
+        src/debug/debug_server.cpp
+    )
+endif()
 
 # Ray tracing sources (conditional)
 if(MYSTRAL_USE_RAYTRACING)
@@ -1087,6 +1091,14 @@ if(MYSTRAL_USE_V8 AND TARGET v8::v8)
 endif()
 
 # SDL3 linkage - prefer static target for single-binary distribution
+# SDL3-dependent sources (window.cpp and input.cpp require SDL3)
+if(SDL3_STATIC_TARGET OR TARGET SDL3::SDL3-static OR TARGET SDL3::SDL3 OR SDL3_LIBRARY)
+    target_sources(mystral-runtime PRIVATE
+        src/platform/window.cpp
+        src/platform/input.cpp
+    )
+endif()
+
 if(SDL3_STATIC_TARGET)
     target_link_libraries(mystral-runtime PRIVATE ${SDL3_STATIC_TARGET})
     message(STATUS "Linking SDL3 statically via ${SDL3_STATIC_TARGET}")

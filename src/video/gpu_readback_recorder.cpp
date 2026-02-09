@@ -444,7 +444,7 @@ public:
         for (int i = 0; i < 100; i++) {
             wgpuDeviceTick(device_);
             if (instance_) {
-                wgpuInstanceProcessEvents(instance_);
+                wgpuInstanceProcessEvents_Compat(instance_);
             }
             processPendingBuffers();
         }

@@ -291,7 +291,7 @@ bool AsyncCapture::submitCaptureSync(WGPUTexture sourceTexture, uint32_t width, 
         wgpuDeviceTick(device_);
 #endif
         if (instance_) {
-            wgpuInstanceProcessEvents(instance_);
+            wgpuInstanceProcessEvents_Compat(instance_);
         }
         maxIterations--;
     }
@@ -489,7 +489,7 @@ void AsyncCapture::processAsync() {
 
     // Process events to trigger callbacks
     if (instance_) {
-        wgpuInstanceProcessEvents(instance_);
+        wgpuInstanceProcessEvents_Compat(instance_);
     }
 #if defined(MYSTRAL_WEBGPU_DAWN)
     wgpuDeviceTick(device_);

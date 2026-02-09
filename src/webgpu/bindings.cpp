@@ -1083,7 +1083,7 @@ bool initBindings(js::Engine* engine, void* wgpuInstance, void* wgpuDevice, void
                                     wgpuDevicePoll(g_device, false, nullptr);
 #endif
                                     if (g_instance) {
-                                        wgpuInstanceProcessEvents(g_instance);
+                                        wgpuInstanceProcessEvents_Compat(g_instance);
                                     }
                                 }
 
@@ -1565,7 +1565,7 @@ bool initBindings(js::Engine* engine, void* wgpuInstance, void* wgpuDevice, void
                                         wgpuDevicePoll(g_device, false, nullptr);
 #else
                                         if (g_instance) {
-                                            wgpuInstanceProcessEvents(g_instance);
+                                            wgpuInstanceProcessEvents_Compat(g_instance);
                                         }
                                         if (g_device) {
                                             wgpuDeviceTick(g_device);
@@ -1601,7 +1601,7 @@ bool initBindings(js::Engine* engine, void* wgpuInstance, void* wgpuDevice, void
                                         wgpuDevicePoll(g_device, true, nullptr);
 #else
                                         if (g_instance) {
-                                            wgpuInstanceProcessEvents(g_instance);
+                                            wgpuInstanceProcessEvents_Compat(g_instance);
                                         }
                                         if (g_device) {
                                             wgpuDeviceTick(g_device);
