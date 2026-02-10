@@ -3074,6 +3074,16 @@ globalThis.__mystralNativeDecodeDracoAsync = function(buffer, attrs) {
 
         jsEngine_->setGlobalProperty("document", document);
 
+        // canvas.ownerDocument - required by Three.js OrbitControls
+        jsEngine_->setProperty(canvas, "ownerDocument", document);
+
+        // canvas.getRootNode - returns document (required by Three.js OrbitControls)
+        jsEngine_->setProperty(canvas, "getRootNode",
+            jsEngine_->newFunction("getRootNode", [this](void* ctx, const std::vector<js::JSValueHandle>& args) {
+                return jsEngine_->getGlobalProperty("document");
+            })
+        );
+
         // Set up document.createElement entirely in JavaScript for proper value handling
         // This must run AFTER document is set as a global
         const char* createElementSetup = R"(
