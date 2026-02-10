@@ -43,6 +43,7 @@ set(APP_SOURCES
 # Resources to bundle (Info.plist is set separately via MACOSX_BUNDLE_INFO_PLIST)
 set(APP_RESOURCES
     gltf-viewer.js
+    threejs-cube.js
     LaunchScreen.storyboard
 )
 

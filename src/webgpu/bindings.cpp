@@ -318,6 +318,72 @@ static WGPUCompareFunction stringToCompareFunction(const std::string& func) {
 }
 
 /**
+ * Strip unsupported WGSL directives for wgpu-native compatibility
+ * 
+ * wgpu-native's WGSL parser doesn't support certain newer WGSL features like:
+ * - diagnostic( off, derivative_uniformity );
+ * 
+ * This function removes these directives so shaders from libraries like Three.js
+ * can work with wgpu-native.
+ */
+static std::string stripUnsupportedWGSLDirectives(const std::string& code) {
+#if defined(MYSTRAL_WEBGPU_WGPU)
+    std::string result;
+    result.reserve(code.size());
+    
+    size_t pos = 0;
+    while (pos < code.size()) {
+        // Look for 'diagnostic' keyword at the start of a line (possibly with whitespace)
+        size_t lineStart = pos;
+        
+        // Skip leading whitespace on this line
+        while (pos < code.size() && (code[pos] == ' ' || code[pos] == '\t')) {
+            pos++;
+        }
+        
+        // Check if line starts with 'diagnostic'
+        if (pos + 10 < code.size() && code.substr(pos, 10) == "diagnostic") {
+            // Find the end of this statement (semicolon or newline)
+            size_t stmtEnd = code.find(';', pos);
+            size_t lineEnd = code.find('\n', pos);
+            
+            if (stmtEnd != std::string::npos && (lineEnd == std::string::npos || stmtEnd < lineEnd)) {
+                // Skip this entire diagnostic statement including the semicolon and newline
+                pos = stmtEnd + 1;
+                if (pos < code.size() && code[pos] == '\n') {
+                    pos++;
+                }
+                continue;
+            } else if (lineEnd != std::string::npos) {
+                // Skip to end of line
+                pos = lineEnd + 1;
+                continue;
+            }
+        }
+        
+        // Not a diagnostic line, copy the content
+        // First, add back any whitespace we skipped
+        result.append(code, lineStart, pos - lineStart);
+        
+        // Copy until end of line
+        while (pos < code.size() && code[pos] != '\n') {
+            result += code[pos++];
+        }
+        
+        // Copy the newline if present
+        if (pos < code.size() && code[pos] == '\n') {
+            result += code[pos++];
+        }
+    }
+    
+    return result;
+#else
+    // Dawn supports diagnostic directives, no stripping needed
+    return code;
+#endif
+}
+
+/**
  * Get the current swapchain texture (or offscreen texture in no-SDL mode)
  */
 static WGPUTexture getCurrentSwapchainTexture() {
@@ -1720,17 +1786,21 @@ bool initBindings(js::Engine* engine, void* wgpuInstance, void* wgpuDevice, void
 
                             auto descriptor = args[0];
                             std::string code = g_engine->toString(g_engine->getProperty(descriptor, "code"));
+                            
+                            // Strip unsupported WGSL directives for wgpu-native compatibility
+                            // (Three.js uses 'diagnostic' directive which wgpu-native doesn't support)
+                            std::string processedCode = stripUnsupportedWGSLDirectives(code);
 
                             // Debug: Print first 500 chars of shader code
-                            if (g_verboseLogging && code.length() > 0) {
-                                std::cout << "[Shader] Creating shader (" << code.length() << " chars):\n"
-                                          << code.substr(0, std::min((size_t)500, code.length()))
-                                          << (code.length() > 500 ? "\n..." : "") << std::endl;
+                            if (g_verboseLogging && processedCode.length() > 0) {
+                                std::cout << "[Shader] Creating shader (" << processedCode.length() << " chars):\n"
+                                          << processedCode.substr(0, std::min((size_t)500, processedCode.length()))
+                                          << (processedCode.length() > 500 ? "\n..." : "") << std::endl;
                             }
 
                             WGPUShaderModuleWGSLDescriptor_Compat wgslDesc = {};
                             WGPUShaderModuleDescriptor shaderDesc = {};
-                            setupShaderModuleWGSL(&shaderDesc, &wgslDesc, code.c_str());
+                            setupShaderModuleWGSL(&shaderDesc, &wgslDesc, processedCode.c_str());
 
                             WGPUShaderModule shaderModule = wgpuDeviceCreateShaderModule(g_device, &shaderDesc);
 
