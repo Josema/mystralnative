@@ -8,7 +8,7 @@
  * Assets:
  * - DamagedHelmet.glb - The GLTF model to display
  * - sunny_rose_garden_2k.hdr - HDR environment map for IBL
- * - threejs-cube - JavaScript code that handles rendering
+ * - threejs-example - JavaScript code that handles rendering
  */
 
 #import <Foundation/Foundation.h>
@@ -259,19 +259,19 @@ int main(int argc, char *argv[]) {
         DEBUG_LOG("Asset path globals set successfully");
 
         // Load and run the main JavaScript code
-        DEBUG_LOG("Loading threejs-cube.js...");
-        std::string jsCode = readBundleFile(@"threejs-cube.js");
+        DEBUG_LOG("Loading threejs-example.js...");
+        std::string jsCode = readBundleFile(@"threejs-example.js");
         if (jsCode.empty()) {
-            DEBUG_LOG("FAILED to load threejs-cube.js!");
-            NSLog(@"Failed to load threejs-cube.js from bundle!");
+            DEBUG_LOG("FAILED to load threejs-example.js!");
+            NSLog(@"Failed to load threejs-example.js from bundle!");
             return 1;
         }
 
         NSLog(@"Loaded JavaScript: %lu bytes", jsCode.length());
         DEBUG_LOG("Loaded JavaScript: %lu bytes", jsCode.length());
 
-        DEBUG_LOG("Evaluating threejs-cube...");
-        if (!runtime->evalScript(jsCode, "threejs-cube")) {
+        DEBUG_LOG("Evaluating threejs-example...");
+        if (!runtime->evalScript(jsCode, "threejs-example")) {
             DEBUG_LOG("FAILED to evaluate JavaScript!");
             NSLog(@"Failed to evaluate JavaScript!");
             return 1;
