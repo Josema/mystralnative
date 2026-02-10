@@ -927,6 +927,7 @@ set(MYSTRAL_SOURCES
     src/audio/audio_context.cpp
     src/audio/audio_bindings.cpp
     src/vfs/embedded_bundle.cpp
+    src/storage/local_storage.cpp
     src/async/event_loop.cpp
     src/video/async_capture.cpp
     src/video/video_recorder.cpp
