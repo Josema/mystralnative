@@ -35,9 +35,5 @@
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.24.0",
     "@types/bun": "^1.1.0"
-  },
-  "dependencies": {
-    "esbuild": "^0.27.3",
-    "three": "^0.182.0"
   }
 }

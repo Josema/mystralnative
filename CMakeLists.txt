@@ -917,6 +917,8 @@ set(MYSTRAL_SOURCES
     src/canvas/canvas2d.cpp
     src/canvas/canvas2d_bindings.cpp
     src/input/input_shim.cpp
+    src/platform/window.cpp
+    src/platform/input.cpp
     src/utils/stb_impl.cpp
     src/utils/cgltf_impl.cpp
     src/http/http_client.cpp
@@ -929,6 +931,7 @@ set(MYSTRAL_SOURCES
     src/vfs/embedded_bundle.cpp
     src/storage/local_storage.cpp
     src/async/event_loop.cpp
+    src/debug/debug_server.cpp
     src/video/async_capture.cpp
     src/video/video_recorder.cpp
     src/video/gpu_readback_recorder.cpp
