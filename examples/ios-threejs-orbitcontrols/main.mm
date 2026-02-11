@@ -1,15 +1,4 @@
-/**
- * iOS GLTF Viewer - Main Entry Point
- *
- * This demonstrates embedding the Mystral Native Runtime in an iOS app.
- * Uses SDL3 for Metal surface management and the mystral-runtime library
- * for WebGPU rendering via wgpu-native.
- *
- * Assets:
- * - DamagedHelmet.glb - The GLTF model to display
- * - sunny_rose_garden_2k.hdr - HDR environment map for IBL
- * - threejs-example - JavaScript code that handles rendering
- */
+
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
@@ -228,35 +217,6 @@ int main(int argc, char *argv[]) {
 
         DEBUG_LOG("Runtime created successfully");
         NSLog(@"Runtime created successfully");
-
-        // Get asset paths
-        std::string gltfPath = getBundleAssetPath(@"DamagedHelmet.glb");
-        std::string envMapPath = getBundleAssetPath(@"sunny_rose_garden_2k.hdr");
-
-        if (gltfPath.empty() || envMapPath.empty()) {
-            NSLog(@"Missing assets! Make sure DamagedHelmet.glb and sunny_rose_garden_2k.hdr are in the bundle.");
-            return 1;
-        }
-
-        NSLog(@"GLTF path: %s", gltfPath.c_str());
-        NSLog(@"Environment map path: %s", envMapPath.c_str());
-        DEBUG_LOG("GLTF path: %s", gltfPath.c_str());
-        DEBUG_LOG("Env map path: %s", envMapPath.c_str());
-
-        // Set global paths for the JavaScript code
-        DEBUG_LOG("Setting up asset path globals...");
-        std::string setupCode = R"(
-            globalThis.__GLTF_PATH__ = ")" + gltfPath + R"(";
-            globalThis.__ENV_MAP_PATH__ = ")" + envMapPath + R"(";
-            console.log("Asset paths configured");
-        )";
-
-        if (!runtime->evalScript(setupCode, "setup.js")) {
-            DEBUG_LOG("FAILED to set up asset paths!");
-            NSLog(@"Failed to set up asset paths!");
-            return 1;
-        }
-        DEBUG_LOG("Asset path globals set successfully");
 
         // Load and run the main JavaScript code
         DEBUG_LOG("Loading threejs-example.js...");

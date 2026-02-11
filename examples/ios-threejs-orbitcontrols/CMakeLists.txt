@@ -49,8 +49,8 @@ set(APP_RESOURCES
 # Asset files (need to be copied)
 set(ASSET_DIR "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 set(ASSET_FILES
-    "${ASSET_DIR}/DamagedHelmet.glb"
-    "${ASSET_DIR}/sunny_rose_garden_2k.hdr"
+    # "${ASSET_DIR}/DamagedHelmet.glb"
+    # "${ASSET_DIR}/sunny_rose_garden_2k.hdr"
 )
 
 # Create the iOS app bundle

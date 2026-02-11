@@ -931,7 +931,6 @@ set(MYSTRAL_SOURCES
     src/vfs/embedded_bundle.cpp
     src/storage/local_storage.cpp
     src/async/event_loop.cpp
-    src/debug/debug_server.cpp
     src/video/async_capture.cpp
     src/video/video_recorder.cpp
     src/video/gpu_readback_recorder.cpp
